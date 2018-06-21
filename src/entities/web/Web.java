@@ -1,9 +1,15 @@
 package entities.web;
 
 import eduni.simjava.Sim_entity;
+import eduni.simjava.Sim_event;
 import eduni.simjava.Sim_port;
+import eduni.simjava.Sim_system;
+import requests.RequestType;
 
 public class Web extends Sim_entity {
+	
+	private final double NETWORK_DELAY = 50;
+	private final double SYS_DELAY = 10;
 	
 	private Sim_port out;
 	private Sim_port in;
@@ -15,5 +21,32 @@ public class Web extends Sim_entity {
 		add_port(out);
 		add_port(in);
 	}
-
+	
+	public void body(){
+		veListaTodosPedidos();
+		
+		for (int i = 0; i < 10; i++) {
+			aceitaPedido();
+		}
+		
+		while(Sim_system.running()) {
+			Sim_event e = new Sim_event();
+			sim_get_next(e);
+			// Resposta do BD no get e também ao aceitar o pedido.
+			sim_process(SYS_DELAY);
+			sim_completed(e);
+		}
+	}
+	
+	private void aceitaPedido() {
+		sim_schedule(out, 0, RequestType.PUT.getValue());
+		System.out.println("Pedido aceito (PUT WEB)");
+		sim_pause(NETWORK_DELAY);
+	}
+	
+	private void veListaTodosPedidos() {
+		sim_schedule(out, 0, RequestType.GET.getValue());
+		System.out.println("Verifica pedidos (GET Web)");
+		sim_pause(NETWORK_DELAY);
+	}
 }
