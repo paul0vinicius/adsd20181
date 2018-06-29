@@ -1,20 +1,17 @@
 package entities.database;
 
-import eduni.simjava.Sim_entity;
-import eduni.simjava.Sim_event;
-import eduni.simjava.Sim_port;
-import eduni.simjava.Sim_system;
+import eduni.simjava.*;
 import requests.RequestType;
 
 public class Database extends Sim_entity {
-	
+
 	private final double NETWORK_DELAY = 50;
 	private final double DB_DELAY = 100;
 	private Sim_port in;
 	private Sim_port out;
 	private Sim_port inW;
 	private Sim_port outW;
-	
+
 	public Database(String name) {
 		super(name);
 		in = new Sim_port("In");
@@ -26,13 +23,14 @@ public class Database extends Sim_entity {
 		//add_port(inW);
 		//add_port(outW);
 	}
-	
+
 	public void body() {
 		while(Sim_system.running()) {
 			Sim_event e = new Sim_event();
 			sim_get_next(e);
 			sim_process(DB_DELAY);
 			sim_completed(e);
+			sim_trace(1, "The database has responded a request, returning data to the requester");
 			// Retorna o dado para quem solicitou, seja o mobile ou desktop.
 			sim_schedule(out, 0, 3);
 			sim_pause(NETWORK_DELAY);
