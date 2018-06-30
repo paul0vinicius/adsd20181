@@ -1,18 +1,23 @@
 package entities.database;
 
 import eduni.simjava.*;
+import eduni.simjava.distributions.*;
+import events.EventTypes;
 import requests.RequestType;
 
 public class Database extends Sim_entity {
+	
+	Sim_stat stat;
 
-	private final double NETWORK_DELAY = 50;
-	private final double DB_DELAY = 100;
+	private Sim_normal_obj db_delay;
+	private Sim_normal_obj network_delay;
+	
 	private Sim_port in;
 	private Sim_port out;
 	private Sim_port inW;
 	private Sim_port outW;
 
-	public Database(String name) {
+	public Database(String name, double mean, double variance) {
 		super(name);
 		in = new Sim_port("In");
 		out = new Sim_port("Out");
@@ -22,19 +27,33 @@ public class Database extends Sim_entity {
 		add_port(out);
 		//add_port(inW);
 		//add_port(outW);
+		
+		db_delay = new Sim_normal_obj("Delay", mean, variance);
+	    add_generator(db_delay);
+	    
+	    network_delay = new Sim_normal_obj("Delay", mean, variance);
+	    add_generator(network_delay);
+	    
+	    stat = new Sim_stat();
+	    stat.add_measure(Sim_stat.ARRIVAL_RATE);
+	    stat.add_measure(Sim_stat.QUEUE_LENGTH);
+        stat.add_measure(Sim_stat.THROUGHPUT);
+        stat.add_measure(Sim_stat.UTILISATION);
+        stat.add_measure(Sim_stat.WAITING_TIME);
+        stat.add_measure(Sim_stat.SERVICE_TIME);
+        stat.add_measure(Sim_stat.RESIDENCE_TIME);
+        set_stat(stat);
 	}
 
 	public void body() {
 		while(Sim_system.running()) {
 			Sim_event e = new Sim_event();
 			sim_get_next(e);
-			sim_process(DB_DELAY);
+			sim_process(db_delay.sample());
 			sim_completed(e);
 			sim_trace(1, "The database has responded a request, returning data to the requester");
-			// Retorna o dado para quem solicitou, seja o mobile ou desktop.
-			sim_schedule(out, 0, 3);
-			sim_pause(NETWORK_DELAY);
-			System.out.println("Retorna dado de pedido(s) (Retorno do BD)");
+			sim_schedule(out, 0, EventTypes.FROM_DB.value);
+			sim_pause(network_delay.sample());
 		}
 	}
 

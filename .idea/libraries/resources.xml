@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="resources">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/resources/simjava.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/SJGV.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

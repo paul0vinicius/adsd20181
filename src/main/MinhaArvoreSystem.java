@@ -13,11 +13,16 @@ public class MinhaArvoreSystem {
 
 	public static void main(String[] args) {
 		Sim_system.initialise();
+		
+		Source source = new Source("Source", 50);
 
-		Mobile mob = new Mobile("Mobile");
-		Database db = new Database("Database");
-		Web web = new Web("Web");
-
+		Mobile mob = new Mobile("Mobile", 230.0, 90.0);
+		Database db = new Database("Database", 240.0, 133.0);
+		Web web = new Web("Web", 120.0, 100.0);
+		
+		Sim_system.link_ports("Source", "Out_mobile", "Mobile", "In");
+		Sim_system.link_ports("Source", "Out_web", "Web", "In");
+		
 		Sim_system.link_ports("Mobile", "Out", "Database", "In");
 		Sim_system.link_ports("Database", "Out", "Mobile", "In");
 		Sim_system.link_ports("Web", "Out", "Database", "In");
